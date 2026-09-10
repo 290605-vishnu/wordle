@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Wordle — Guess the AI Term</title>
+  <meta name="description" content="A Wordle-style word guessing game featuring challenging AI and machine learning terminology. Test your AI knowledge!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">&#x1F916;</span>
+        <span class="logo-text">AI<span class="logo-accent">WORDLE</span></span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-how-to-play" class="icon-btn" title="How to Play">?</button>
+        <button id="btn-stats" class="icon-btn" title="Statistics">&#x1F4CA;</button>
+        <button id="btn-new-game" class="icon-btn" title="New Game">&#x21BA;</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="toast" class="toast"></div>
+
+  <main class="main">
+    <div class="word-length-selector">
+      <span class="selector-label">Word Length:</span>
+      <div class="selector-buttons" id="length-selector">
+        <button class="length-btn" data-length="5">5</button>
+        <button class="length-btn active" data-length="6">6</button>
+        <button class="length-btn" data-length="7">7</button>
+        <button class="length-btn" data-length="8">8</button>
+      </div>
+    </div>
+
+    <div class="board-container">
+      <div id="board" class="board"></div>
+    </div>
+
+    <div class="hint-section" id="hint-section">
+      <button id="btn-hint" class="hint-btn">&#x1F4A1; Reveal Hint</button>
+      <div id="hint-text" class="hint-text hidden"></div>
+    </div>
+
+    <div class="keyboard" id="keyboard">
+      <div class="keyboard-row" id="row-1"></div>
+      <div class="keyboard-row" id="row-2"></div>
+      <div class="keyboard-row" id="row-3"></div>
+    </div>
+  </main>
+
+  <div id="modal-how" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <button class="modal-close" data-modal="modal-how">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <p class="how-intro">Guess the hidden <strong>AI term</strong> in 6 tries.</p>
+        <div class="example-section">
+          <p class="example-label">After each guess, tiles change color:</p>
+          <div class="example-row">
+            <div class="ex-tile correct">N</div><div class="ex-tile">E</div><div class="ex-tile">U</div><div class="ex-tile">R</div><div class="ex-tile">A</div><div class="ex-tile">L</div>
+          </div>
+          <p class="example-desc"><span class="badge correct">Green</span> &mdash; Correct spot</p>
+          <div class="example-row">
+            <div class="ex-tile">T</div><div class="ex-tile present">O</div><div class="ex-tile">K</div><div class="ex-tile">E</div><div class="ex-tile">N</div>
+          </div>
+          <p class="example-desc"><span class="badge present">Yellow</span> &mdash; Wrong spot</p>
+          <div class="example-row">
+            <div class="ex-tile">L</div><div class="ex-tile">A</div><div class="ex-tile absent">Y</div><div class="ex-tile">E</div><div class="ex-tile">R</div>
+          </div>
+          <p class="example-desc"><span class="badge absent">Gray</span> &mdash; Not in word</p>
+        </div>
+        <div class="how-tips">
+          <p>&#x1F916; All words are <strong>AI &amp; ML</strong> terminology</p>
+          <p>&#x1F4A1; Use the <strong>Hint</strong> button for a clue</p>
+          <p>&#x1F522; Choose <strong>5&ndash;8 letter</strong> words</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-stats" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Statistics</h2>
+        <button class="modal-close" data-modal="modal-stats">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-value" id="stat-played">0</div><div class="stat-label">Played</div></div>
+          <div class="stat-item"><div class="stat-value" id="stat-win-pct">0%</div><div class="stat-label">Win Rate</div></div>
+          <div class="stat-item"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+          <div class="stat-item"><div class="stat-value" id="stat-max-streak">0</div><div class="stat-label">Best Streak</div></div>
+        </div>
+        <div class="dist-section">
+          <h3 class="dist-title">Guess Distribution</h3>
+          <div id="distribution-chart" class="dist-chart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-gameover" class="modal-overlay">
+    <div class="modal modal-gameover">
+      <div class="modal-header">
+        <h2 id="gameover-title"></h2>
+        <button class="modal-close" data-modal="modal-gameover">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="answer-reveal" id="answer-reveal"></div>
+        <div class="word-definition" id="word-definition"></div>
+        <div class="gameover-actions">
+          <button id="btn-play-again" class="btn-primary">&#x21BA; Play Again</button>
+          <button id="btn-share" class="btn-secondary">&#x1F4E4; Share</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+  <script src="words.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
